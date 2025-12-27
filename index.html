@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackRoad API Documentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #000;
+            color: #0f0;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: rgba(0, 255, 0, 0.03);
+            border-right: 1px solid #0f0;
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid #0f0;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #FF9D00, #FF0066, #7700FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-header p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .nav-section {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+        }
+
+        .nav-section h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            color: #FF9D00;
+        }
+
+        .nav-section ul {
+            list-style: none;
+        }
+
+        .nav-section li {
+            padding: 0.5rem 0;
+        }
+
+        .nav-section a {
+            color: #0f0;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-section a:hover {
+            color: #0af;
+            padding-left: 0.5rem;
+        }
+
+        .content {
+            padding: 3rem;
+            max-width: 1000px;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #0f0;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #FF9D00, #FF0066, #7700FF, #0066FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .endpoint-section {
+            margin-bottom: 3rem;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .method {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .method-get { background: #0af; color: #000; }
+        .method-post { background: #0f0; color: #000; }
+        .method-put { background: #ff0; color: #000; }
+        .method-delete { background: #f00; color: #fff; }
+
+        .endpoint-path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            color: #fff;
+        }
+
+        .endpoint-description {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #0f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #0f0;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .code-header h4 {
+            color: #FF9D00;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #0f0;
+            color: #000;
+        }
+
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .params-table th,
+        .params-table td {
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .params-table th {
+            background: rgba(0, 255, 0, 0.1);
+            color: #FF9D00;
+            font-weight: 600;
+        }
+
+        .params-table code {
+            background: rgba(0, 255, 0, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            color: #0af;
+        }
+
+        .response-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .status-200 { background: #0f0; color: #000; }
+        .status-400 { background: #ff0; color: #000; }
+        .status-401 { background: #f90; color: #000; }
+        .status-500 { background: #f00; color: #fff; }
+
+        @media (max-width: 768px) {
+            body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: relative;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>📡 API Docs</h1>
+            <p>v1.0.0</p>
+        </div>
+
+        <nav class="nav-section">
+            <h3>Getting Started</h3>
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#authentication">Authentication</a></li>
+                <li><a href="#rate-limits">Rate Limits</a></li>
+                <li><a href="#errors">Error Handling</a></li>
+            </ul>
+        </nav>
+
+        <nav class="nav-section">
+            <h3>AI Endpoints</h3>
+            <ul>
+                <li><a href="#inference">POST /ai/inference</a></li>
+                <li><a href="#models">GET /ai/models</a></li>
+                <li><a href="#agents">GET /ai/agents</a></li>
+            </ul>
+        </nav>
+
+        <nav class="nav-section">
+            <h3>Quantum Endpoints</h3>
+            <ul>
+                <li><a href="#circuits">POST /quantum/circuit</a></li>
+                <li><a href="#simulation">POST /quantum/simulate</a></li>
+                <li><a href="#qubits">GET /quantum/qubits</a></li>
+            </ul>
+        </nav>
+
+        <nav class="nav-section">
+            <h3>Data Endpoints</h3>
+            <ul>
+                <li><a href="#metrics">GET /data/metrics</a></li>
+                <li><a href="#logs">GET /data/logs</a></li>
+                <li><a href="#events">GET /data/events</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="content">
+        <div class="page-header">
+            <h1>BlackRoad API</h1>
+            <p>Complete API reference for BlackRoad OS platform</p>
+        </div>
+
+        <section id="introduction" class="endpoint-section">
+            <h2>Introduction</h2>
+            <p class="endpoint-description">
+                The BlackRoad API provides programmatic access to our AI, quantum computing, and infrastructure platforms.
+                All endpoints use REST principles and return JSON responses.
+            </p>
+            <div class="code-block">
+                <div class="code-header">
+                    <h4>Base URL</h4>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre>https://api.blackroad.io/v1</pre>
+            </div>
+        </section>
+
+        <section id="authentication" class="endpoint-section">
+            <h2>Authentication</h2>
+            <p class="endpoint-description">
+                All API requests require authentication using an API key. Include your key in the Authorization header.
+            </p>
+            <div class="code-block">
+                <div class="code-header">
+                    <h4>Example Request</h4>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre>curl https://api.blackroad.io/v1/ai/models \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"</pre>
+            </div>
+        </section>
+
+        <section id="inference" class="endpoint-section">
+            <div class="endpoint-header">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-path">/ai/inference</span>
+            </div>
+            <p class="endpoint-description">
+                Run inference on an AI model with custom input data.
+            </p>
+
+            <h3>Parameters</h3>
+            <table class="params-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>model</code></td>
+                        <td>string</td>
+                        <td>Yes</td>
+                        <td>Model ID to use for inference</td>
+                    </tr>
+                    <tr>
+                        <td><code>input</code></td>
+                        <td>object</td>
+                        <td>Yes</td>
+                        <td>Input data for the model</td>
+                    </tr>
+                    <tr>
+                        <td><code>parameters</code></td>
+                        <td>object</td>
+                        <td>No</td>
+                        <td>Model-specific parameters</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Request Example</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <h4>JSON</h4>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre>{
+  "model": "lucidia-qi-v1",
+  "input": {
+    "text": "Explain quantum entanglement"
+  },
+  "parameters": {
+    "temperature": 0.7,
+    "max_tokens": 500
+  }
+}</pre>
+            </div>
+
+            <h3>Response</h3>
+            <p><span class="response-status status-200">200</span> Success</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <h4>JSON</h4>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre>{
+  "id": "inf_abc123",
+  "model": "lucidia-qi-v1",
+  "output": {
+    "text": "Quantum entanglement is a phenomenon where..."
+  },
+  "usage": {
+    "tokens": 342
+  },
+  "created_at": "2025-12-26T10:30:00Z"
+}</pre>
+            </div>
+        </section>
+
+        <section id="models" class="endpoint-section">
+            <div class="endpoint-header">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/ai/models</span>
+            </div>
+            <p class="endpoint-description">
+                List all available AI models.
+            </p>
+
+            <h3>Response</h3>
+            <p><span class="response-status status-200">200</span> Success</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <h4>JSON</h4>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre>{
+  "models": [
+    {
+      "id": "lucidia-qi-v1",
+      "name": "Lucidia QI v1",
+      "type": "language",
+      "capabilities": ["text-generation", "reasoning"],
+      "status": "active"
+    },
+    {
+      "id": "alice-migration-v2",
+      "name": "Alice Migration v2",
+      "type": "specialized",
+      "capabilities": ["code-migration", "analysis"],
+      "status": "active"
+    }
+  ],
+  "total": 2
+}</pre>
+            </div>
+        </section>
+
+        <section id="circuits" class="endpoint-section">
+            <div class="endpoint-header">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-path">/quantum/circuit</span>
+            </div>
+            <p class="endpoint-description">
+                Create and execute a quantum circuit.
+            </p>
+
+            <h3>Request Example</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <h4>JSON</h4>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre>{
+  "qubits": 3,
+  "gates": [
+    { "type": "H", "target": 0 },
+    { "type": "CNOT", "control": 0, "target": 1 },
+    { "type": "CNOT", "control": 1, "target": 2 }
+  ],
+  "shots": 1000
+}</pre>
+            </div>
+
+            <h3>Response</h3>
+            <p><span class="response-status status-200">200</span> Success</p>
+            <div class="code-block">
+                <div class="code-header">
+                    <h4>JSON</h4>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre>{
+  "circuit_id": "qc_xyz789",
+  "results": {
+    "000": 503,
+    "111": 497
+  },
+  "execution_time": "0.234s",
+  "status": "completed"
+}</pre>
+            </div>
+        </section>
+
+        <section id="metrics" class="endpoint-section">
+            <div class="endpoint-header">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/data/metrics</span>
+            </div>
+            <p class="endpoint-description">
+                Retrieve system metrics and analytics.
+            </p>
+
+            <h3>Query Parameters</h3>
+            <table class="params-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>from</code></td>
+                        <td>timestamp</td>
+                        <td>Start time (ISO 8601)</td>
+                    </tr>
+                    <tr>
+                        <td><code>to</code></td>
+                        <td>timestamp</td>
+                        <td>End time (ISO 8601)</td>
+                    </tr>
+                    <tr>
+                        <td><code>interval</code></td>
+                        <td>string</td>
+                        <td>Aggregation interval (1m, 5m, 1h, 1d)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Response</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <h4>JSON</h4>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre>{
+  "metrics": [
+    {
+      "timestamp": "2025-12-26T10:00:00Z",
+      "requests": 1523,
+      "latency_p95": "42ms",
+      "errors": 3
+    }
+  ],
+  "interval": "1m",
+  "from": "2025-12-26T10:00:00Z",
+  "to": "2025-12-26T11:00:00Z"
+}</pre>
+            </div>
+        </section>
+
+        <section id="errors" class="endpoint-section">
+            <h2>Error Handling</h2>
+            <p class="endpoint-description">
+                The API uses standard HTTP status codes and returns detailed error messages in JSON format.
+            </p>
+
+            <h3>Error Response Format</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <h4>JSON</h4>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre>{
+  "error": {
+    "code": "invalid_request",
+    "message": "Missing required parameter: model",
+    "details": {
+      "parameter": "model",
+      "location": "body"
+    }
+  }
+}</pre>
+            </div>
+
+            <h3>Common Error Codes</h3>
+            <table class="params-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Code</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="response-status status-400">400</span></td>
+                        <td><code>invalid_request</code></td>
+                        <td>Request validation failed</td>
+                    </tr>
+                    <tr>
+                        <td><span class="response-status status-401">401</span></td>
+                        <td><code>unauthorized</code></td>
+                        <td>Invalid or missing API key</td>
+                    </tr>
+                    <tr>
+                        <td><span class="response-status status-500">500</span></td>
+                        <td><code>internal_error</code></td>
+                        <td>Server error occurred</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
